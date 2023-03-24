@@ -60,7 +60,7 @@ export async function action({ request }: ActionArgs) {
 
 export const meta: V2_MetaFunction = () => [{ title: "Login" }];
 
-export default function LoginPage() {
+export function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/notes";
   const actionData = useActionData<typeof action>();
@@ -171,5 +171,13 @@ export default function LoginPage() {
         </Form>
       </div>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Form action="/auth/twitch" method="post">
+      <button>Login with Twitch</button>
+    </Form>
   );
 }
