@@ -13,7 +13,13 @@ import { getUser } from "./session.server";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+  return [
+    { rel: "stylesheet", href: tailwindStylesheetUrl },
+    {
+      rel: "stylesheet",
+      href: "https://unpkg.com/augmented-ui@2/augmented-ui.min.css",
+    },
+  ];
 };
 
 export async function loader({ request }: LoaderArgs) {
