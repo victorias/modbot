@@ -17,15 +17,57 @@ export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
 }
 
-export async function createUser(email: User["email"], password: string) {
-  const hashedPassword = await bcrypt.hash(password, 10);
+export async function createUser({
+  email,
+  password,
+  displayName,
+  profileImageUrl,
+}: {
+  email: User["email"];
+  password?: string;
+  displayName?: User["displayName"];
+  profileImageUrl?: User["profileImageUrl"];
+}) {
+  // Password is optional, only use it if user did not use social-login
+  let passwordObj = {};
+  if (password) {
+    passwordObj = {
+      password: { create: { hash: await bcrypt.hash(password, 10) } },
+    };
+  }
 
   return prisma.user.create({
     data: {
       email,
-      password: {
+      displayName,
+      profileImageUrl,
+      ...passwordObj,
+    },
+  });
+}
+
+export async function createTwitchUser({
+  email,
+  displayName,
+  profileImageUrl,
+  twitchId,
+  twitchLogin,
+}: {
+  email: User["email"];
+  displayName?: User["displayName"];
+  profileImageUrl?: User["profileImageUrl"];
+  twitchId: TwitchIntegration["id"];
+  twitchLogin: TwitchIntegration["twitchLogin"];
+}) {
+  return prisma.user.create({
+    data: {
+      email,
+      displayName,
+      profileImageUrl,
+      twitchIntegration: {
         create: {
-          hash: hashedPassword,
+          id: twitchId,
+          twitchLogin,
         },
       },
     },

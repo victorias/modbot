@@ -10,12 +10,16 @@ generator client {
 model User {
   id    String @id @default(cuid())
   email String @unique
+  displayName String?
+  profileImageUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   password Password?
   notes    Note[]
+  twitchIntegration TwitchIntegration?
+  twitchAccessToken TwitchAccessToken?
 }
 
 model Password {
@@ -35,4 +39,22 @@ model Note {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+}
+
+model TwitchIntegration {
+  id String @id // twitch ID
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @unique
+  twitchLogin String // what Twitch Profile their username
+}
+
+model TwitchAccessToken {
+  userId String @id @unique 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  accessToken String // The access token which is necessary for every request to the Twitch API.
+  expiresIn Int? // The time, in seconds from the obtainment date, when the access token expires.
+  obtainmentTimestamp Int // The date when the token was obtained, in epoch milliseconds.
+  refreshToken String? // The refresh token which is necessary to refresh the access token once it expires.
+  scope String // The scope the access token is valid for, i.e. what the token enables you to do.
 }

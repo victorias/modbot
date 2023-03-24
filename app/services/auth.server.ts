@@ -1,7 +1,11 @@
 import { Authenticator } from "remix-auth";
 import { sessionStorage } from "~/session.server";
 import { TwitchStrategy } from "@03gibbss/remix-auth-twitch";
-import { getUserByTwitchId } from "~/models/user.server";
+import {
+  createTwitchUser,
+  createUser,
+  getUserByTwitchId,
+} from "~/models/user.server";
 
 const scopes = [
   "channel:moderate",
@@ -28,16 +32,24 @@ let twitchStrategy = new TwitchStrategy(
   },
   async ({ accessToken, extraParams, profile }) => {
     // Get the user data from your DB or API using the tokens and profile
-    console.log({ profile });
-    const user = await getUserByTwitchId(profile.id);
+    const { id, email, display_name, login, profile_image_url } = profile;
+    let user: User | null = await getUserByTwitchId(profile.id);
 
     if (user) {
       return { id: user.id };
     }
 
-    // No user so first login and we have to make a new one
-    console.log("no user");
-    return { id: "null" };
+    // We didn't find a user which means this is their first login
+    // Time to make a new user!
+    user = await createTwitchUser({
+      email,
+      twitchId: id,
+      displayName: display_name,
+      twitchLogin: login,
+      profileImageUrl: profile_image_url,
+    });
+
+    return { id: user.id };
   }
 );
 
