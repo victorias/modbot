@@ -4,6 +4,7 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
+import { chatClient, init } from "~/services/twitch.server";
 
 const app = express();
 const metricsApp = express();
@@ -93,10 +94,13 @@ app.all(
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+app.listen(port, async () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
+  console.log(`chatClient: ${chatClient}`);
+
+  await init();
 });
 
 const metricsPort = process.env.METRICS_PORT || 3001;
