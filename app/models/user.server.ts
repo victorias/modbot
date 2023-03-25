@@ -1,4 +1,9 @@
-import type { Password, TwitchIntegration, User } from "@prisma/client";
+import type {
+  Password,
+  TwitchAccessToken,
+  TwitchIntegration,
+  User,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
@@ -59,6 +64,8 @@ export async function createTwitchUser({
   twitchId: TwitchIntegration["id"];
   twitchLogin: TwitchIntegration["twitchLogin"];
 }) {
+  // Note: Prisma only allows 1 create, so we cannot also create
+  // access token in the same query
   return prisma.user.create({
     data: {
       email,
