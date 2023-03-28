@@ -4,7 +4,7 @@ import { TwitchStrategy } from "@03gibbss/remix-auth-twitch";
 import { createTwitchUser, getUserByTwitchId } from "~/models/user.server";
 import { RefreshingAuthProvider } from "@twurple/auth";
 import { setTwitchAccessToken } from "~/models/twitch.server";
-import { authProvider } from "./twitch.server";
+import { apiClient, authProvider, chatClient } from "./twitch.server";
 
 const scopes = [
   "channel:moderate", // Perform moderation actions in a channel. The user requesting the scope must be a moderator in the channel.
@@ -70,7 +70,11 @@ let twitchStrategy = new TwitchStrategy(
       login,
       profile_image_url,
     } = profile;
-    let user: User | null = await getUserByTwitchId(profile.id);
+    let user: User | null = await getUserByTwitchId(twitchId);
+    const channel = await apiClient.channels.getChannelInfoById(twitchId);
+    console.log(`channel info`);
+    console.log(channel?.id);
+    console.log(channel?.displayName);
 
     if (!!!user) {
       // We didn't find a user which means this is their first login
@@ -81,6 +85,8 @@ let twitchStrategy = new TwitchStrategy(
         displayName: display_name,
         twitchLogin: login,
         profileImageUrl: profile_image_url,
+        twitchChannelId: channel!.id,
+        twitchChannelName: channel!.name,
       });
     }
 

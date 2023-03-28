@@ -57,12 +57,16 @@ export async function createTwitchUser({
   profileImageUrl,
   twitchId,
   twitchLogin,
+  twitchChannelName,
+  twitchChannelId,
 }: {
   email: User["email"];
   displayName?: User["displayName"];
   profileImageUrl?: User["profileImageUrl"];
   twitchId: TwitchIntegration["id"];
   twitchLogin: TwitchIntegration["twitchLogin"];
+  twitchChannelName: TwitchIntegration["twitchChannelName"];
+  twitchChannelId: TwitchIntegration["twitchChannelId"];
 }) {
   // Note: Prisma only allows 1 create, so we cannot also create
   // access token in the same query
@@ -75,6 +79,8 @@ export async function createTwitchUser({
         create: {
           id: twitchId,
           twitchLogin,
+          twitchChannelId,
+          twitchChannelName,
         },
       },
     },

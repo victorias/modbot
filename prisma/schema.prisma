@@ -46,6 +46,8 @@ model TwitchIntegration {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique
   twitchLogin String // what Twitch Profile their username
+  twitchChannelName String
+  twitchChannelId String @unique
 }
 
 model TwitchAccessToken {
