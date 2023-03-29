@@ -31,6 +31,20 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/twitch-bot/*", express.json());
+
+// Route /twitch-bot/ away from remix
+app.all("/twitch-bot/channels", (req, res) => {
+  res.json({ currentChannels: chatClient.currentChannels });
+});
+
+app.all("/twitch-bot/join", async (req, res) => {
+  const channelName = req.body.channel;
+  console.log(`joining ${channelName}`);
+  await chatClient.join(channelName);
+  res.json({ currentChannels: chatClient.currentChannels });
+});
+
 // if we're not in the primary region, then we need to make sure all
 // non-GET/HEAD/OPTIONS requests hit the primary region rather than read-only
 // Postgres DBs.

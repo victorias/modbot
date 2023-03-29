@@ -1,9 +1,4 @@
-import type {
-  Password,
-  TwitchAccessToken,
-  TwitchIntegration,
-  User,
-} from "@prisma/client";
+import type { Password, TwitchIntegration, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";

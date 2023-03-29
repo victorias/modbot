@@ -45,8 +45,7 @@ const scopes = [
 ];
 
 const scope = scopes.join(" ");
-const clientId = process.env.TWITCH_CLIENT_ID!;
-const clientSecret = process.env.TWITCH_CLIENT_SECRET!;
+const modbotId = process.env.MODBOT_USER_ID;
 
 type User = { id: string };
 
@@ -100,8 +99,25 @@ let twitchStrategy = new TwitchStrategy(
         expiresIn: 0,
         obtainmentTimestamp: 0,
       },
-      ["chat", "moderation"]
+      ["moderation"]
     );
+
+    if (modbotId) {
+      // Set modbot as mod
+      try {
+        console.log("attempting to make mod");
+        // await apiClient.moderation.addModerator(twitchId, "40673593");
+        // 40673593 is modbot's twitch Id. @TODO: put this in env or something
+        console.log("made mod");
+
+        console.log("attempting to join channel");
+        // Tell modbot to join this channel
+        // await chatClient.join(channel!.name);
+        console.log("joined channel");
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     return { id: user.id };
   }

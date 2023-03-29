@@ -56,3 +56,11 @@ export async function getTwitchTokensForUserId(userId: User["id"]) {
     },
   });
 }
+
+export async function getTwitchIntegrationForUserId(userId: User["id"]) {
+  return prisma.twitchIntegration.findUniqueOrThrow({
+    where: {
+      userId,
+    },
+  });
+}
