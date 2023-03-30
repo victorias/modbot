@@ -70,3 +70,13 @@ export async function getTwitchIntegrationForUserId(userId: User["id"]) {
 export async function getModbotTwitchIntegration() {
   return getTwitchIntegrationForUserId(modbotId!);
 }
+
+export async function getTwitchIntegrationForChannelId(
+  channelId: TwitchIntegration["twitchChannelId"]
+) {
+  return prisma.twitchIntegration.findUnique({
+    where: {
+      twitchChannelId: channelId,
+    },
+  });
+}

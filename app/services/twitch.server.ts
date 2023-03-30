@@ -3,6 +3,8 @@ import { RefreshingAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 import { moderate } from "~/bot/mod/openai.server";
 import {
+  getModbotTwitchIntegration,
+  getTwitchIntegrationForChannelId,
   getTwitchTokensForUserId,
   setTwitchAccessToken,
 } from "~/models/twitch.server";
@@ -45,23 +47,25 @@ const apiClient = new ApiClient({
 chatClient.onMessage(async (channel, user, text, message) => {
   if (!modbotId) return;
   console.log(`${channel} @${user}: ${text}`);
-  // const flagged = await moderate(text);
-  // console.log(`openai says: ${flagged}`);
-  // console.log(message.channelId);
-  // console.log(message.id);
+  const { flagged } = await moderate(text);
 
-  // if (flagged) {
-  //   // @TODO
-  //   // If OpenAI flags the message,
-  //   // we delete it and store it in our db (?)
-  //   const broadercasterTwitchId =
-  //     "twitchId of broadcaster/user of the app. need to get this";
-  //   await apiClient.moderation.deleteChatMessages(
-  //     broadercasterTwitchId,
-  //     modbotId,
-  //     message.id
-  //   );
-  // }
+  if (flagged && message.channelId) {
+    // @TODO
+    // If OpenAI flags the message,
+    // we delete it and store it in our db (?)
+    const twitchIntegration = await getTwitchIntegrationForChannelId(
+      message.channelId
+    );
+    const modbotTwitchIntegration = await getModbotTwitchIntegration();
+    const broadercasterTwitchId = twitchIntegration?.id;
+    if (broadercasterTwitchId) {
+      await apiClient.moderation.deleteChatMessages(
+        broadercasterTwitchId,
+        modbotTwitchIntegration.id,
+        message.id
+      );
+    }
+  }
 });
 
 chatClient.onJoinFailure((channel, reason) => {
