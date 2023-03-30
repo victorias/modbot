@@ -2,6 +2,8 @@ import { TwitchAccessToken, TwitchIntegration, User } from "@prisma/client";
 import { prisma } from "~/db.server";
 import { getUserByTwitchId } from "./user.server";
 
+const modbotId = process.env.MODBOT_USER_ID;
+
 export async function setTwitchAccessToken({
   twitchId,
   accessToken,
@@ -63,4 +65,8 @@ export async function getTwitchIntegrationForUserId(userId: User["id"]) {
       userId,
     },
   });
+}
+
+export async function getModbotTwitchIntegration() {
+  return getTwitchIntegrationForUserId(modbotId!);
 }

@@ -4,7 +4,18 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
-import { chatClient, init } from "~/services/twitch.server";
+import {
+  apiClient,
+  authProvider,
+  chatClient,
+  init,
+} from "~/services/twitch.server";
+import {
+  getModbotTwitchIntegration,
+  getTwitchIntegrationForUserId,
+} from "~/models/twitch.server";
+
+const modbotId = process.env.MODBOT_USER_ID;
 
 const app = express();
 const metricsApp = express();
@@ -38,11 +49,41 @@ app.all("/twitch-bot/channels", (req, res) => {
   res.json({ currentChannels: chatClient.currentChannels });
 });
 
-app.all("/twitch-bot/join", async (req, res) => {
+app.all("/twitch-bot/channels/join", async (req, res) => {
   const channelName = req.body.channel;
   console.log(`joining ${channelName}`);
   await chatClient.join(channelName);
   res.json({ currentChannels: chatClient.currentChannels });
+});
+
+app.all("/twitch-bot/channels/mod", async (req, res) => {
+  console.log("/mod");
+  const userId = req.body.userId;
+  const twitchIntegration = await getTwitchIntegrationForUserId(userId);
+  const modbotIntegration = await getModbotTwitchIntegration();
+  try {
+    await apiClient.moderation.addModerator(
+      twitchIntegration.id,
+      modbotIntegration.id
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    console.log("Couldn't make twitch mod");
+    console.log(e);
+    const message = JSON.parse(e?.body).message;
+    if (message === "user is already a mod") {
+      console.log("user is already mod");
+      res.json({
+        ok: true,
+      });
+      return;
+    }
+
+    res.json({
+      ok: false,
+      error: message,
+    });
+  }
 });
 
 // if we're not in the primary region, then we need to make sure all
