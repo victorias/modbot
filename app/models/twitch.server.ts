@@ -80,3 +80,11 @@ export async function getTwitchIntegrationForChannelId(
     },
   });
 }
+
+export async function getAllTwitchChannels() {
+  return prisma.twitchIntegration.findMany({
+    select: {
+      twitchChannelName: true,
+    },
+  });
+}

@@ -68,8 +68,6 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
     );
     res.json({ ok: true });
   } catch (e) {
-    console.log("Couldn't make twitch mod");
-    console.log(e);
     const message = JSON.parse(e?.body).message;
     if (message === "user is already a mod") {
       console.log("user is already mod");
@@ -90,7 +88,6 @@ app.get("/twitch-bot/onboarded", async (req, res) => {
   console.log("/onboarded");
   const userId = req.query.userId as string;
   const twitchIntegration = await getTwitchIntegrationForUserId(userId);
-  const modbotIntegration = await getModbotTwitchIntegration();
 
   // just check if we are in the channel to see if we are onboarded.
   console.log(twitchIntegration.twitchChannelName);
@@ -171,7 +168,6 @@ app.listen(port, async () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
-  console.log(`chatClient: ${chatClient}`);
 
   await init();
 });

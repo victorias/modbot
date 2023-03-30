@@ -3,6 +3,7 @@ import { RefreshingAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 import { moderate } from "~/bot/mod/openai.server";
 import {
+  getAllTwitchChannels,
   getModbotTwitchIntegration,
   getTwitchIntegrationForChannelId,
   getTwitchTokensForUserId,
@@ -34,9 +35,17 @@ const authProvider = new RefreshingAuthProvider({
   },
 });
 
+// When the server restarts, we need to rejoin
+// all registered channels
+async function getTwitchChannelsToJoin() {
+  return (await getAllTwitchChannels()).map(
+    ({ twitchChannelName }) => twitchChannelName
+  );
+}
+
 const chatClient = new ChatClient({
   authProvider,
-  channels: ["jenntacles"],
+  channels: getTwitchChannelsToJoin,
   isAlwaysMod: true, // we are always a mod in joined channels. raises rate limit and lifts one-second-between messages rule
 });
 
@@ -84,7 +93,10 @@ chatClient.onAuthenticationSuccess(() => {
 });
 
 export async function init() {
+  console.log("initializing twitch...");
+
   if (!modbotId) return;
+
   const modbotTokens = await getTwitchTokensForUserId(modbotId);
 
   await authProvider.addUserForToken(
