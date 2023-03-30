@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { json, LoaderArgs } from "@remix-run/server-runtime";
 import { useEffect, useState } from "react";
 import { getTwitchIntegrationForUserId } from "~/models/twitch.server";
@@ -35,6 +35,7 @@ export default function OnboardingPage() {
   } = useLoaderData<typeof loader>();
   const [currentStep, setCurrentStep] =
     useState<LoadingStep>("joining-channel");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleJoinChannel = async () => {
@@ -51,12 +52,22 @@ export default function OnboardingPage() {
       }, 3000); // delay for 3 seconds
     };
 
+    const redirectToDashboard = async () => {
+      setTimeout(async () => {
+        console.log("navigating back to dashboard");
+        navigate("/dashboard");
+      }, 3000); // delay for 3 seconds
+    };
+
     switch (currentStep) {
       case "joining-channel":
         handleJoinChannel();
         break;
       case "making-mod":
         handleMakeMod();
+        break;
+      case "done":
+        redirectToDashboard();
         break;
       default:
         // Do nothing

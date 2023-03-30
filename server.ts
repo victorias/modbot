@@ -86,6 +86,24 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
   }
 });
 
+app.get("/twitch-bot/onboarded", async (req, res) => {
+  console.log("/onboarded");
+  const userId = req.query.userId as string;
+  const twitchIntegration = await getTwitchIntegrationForUserId(userId);
+  const modbotIntegration = await getModbotTwitchIntegration();
+
+  // just check if we are in the channel to see if we are onboarded.
+  console.log(twitchIntegration.twitchChannelName);
+  const isOnboarded = chatClient.currentChannels.includes(
+    `#${twitchIntegration.twitchChannelName}`
+  );
+  console.log(chatClient.currentChannels);
+  res.json({
+    ok: true,
+    isOnboarded,
+  });
+});
+
 // if we're not in the primary region, then we need to make sure all
 // non-GET/HEAD/OPTIONS requests hit the primary region rather than read-only
 // Postgres DBs.

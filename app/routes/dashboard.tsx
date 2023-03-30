@@ -1,14 +1,28 @@
 import { Form, useLoaderData } from "@remix-run/react";
-import { ActionArgs, json, LoaderArgs } from "@remix-run/server-runtime";
+import {
+  ActionArgs,
+  json,
+  LoaderArgs,
+  redirect,
+} from "@remix-run/server-runtime";
 import { useState } from "react";
 import { getTwitchIntegrationForUserId } from "~/models/twitch.server";
 import { authenticator } from "~/services/auth.server";
 import { apiClient, authProvider } from "~/services/twitch.server";
+import { get } from "~/utils/fetch";
 
 export async function loader({ request }: LoaderArgs) {
+  // Redirect to /onboarding if we the user has not been onboarded
+  // @link: https://github.com/sergiodxa/remix-auth#custom-redirect-url-based-on-the-user
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
+
+  const response = await get("/twitch-bot/onboarded", { userId: user.id });
+  console.log({ response });
+  if (!response.isOnboarded) {
+    return redirect("/onboarding");
+  }
 
   const twitchIntegration = await getTwitchIntegrationForUserId(user.id);
 
