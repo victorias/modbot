@@ -4,6 +4,7 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
+import cors from "cors";
 import {
   apiClient,
   authProvider,
@@ -17,6 +18,10 @@ import {
 
 const modbotId = process.env.MODBOT_USER_ID;
 
+// Trusted domains
+// @TODO @PROD
+const allowedOrigins = ["http://localhost:3000"];
+
 const app = express();
 const metricsApp = express();
 app.use(
@@ -24,6 +29,14 @@ app.use(
     metricsPath: "/metrics",
     collectDefaultMetrics: true,
     metricsApp,
+  })
+);
+
+// Enable CORS and allow requests only from trusted domains
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Replace with your domain
+    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
   })
 );
 
