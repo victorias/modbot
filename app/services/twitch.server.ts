@@ -4,6 +4,7 @@ import { ChatClient } from "@twurple/chat";
 import { moderate } from "~/bot/mod/openai.server";
 import {
   getAllTwitchChannels,
+  getAllTwitchTokens,
   getModbotTwitchIntegration,
   getTwitchIntegrationForChannelId,
   getTwitchTokensForUserId,
@@ -92,22 +93,54 @@ chatClient.onAuthenticationSuccess(() => {
   console.log(chatClient.currentChannels);
 });
 
+async function addUsersToAuthProvider() {
+  const tokens = await getAllTwitchTokens();
+  return Promise.all(
+    tokens.map(
+      async ({
+        user: { twitchIntegration, id },
+        accessToken,
+        refreshToken,
+        obtainmentTimestamp,
+        expiresIn,
+      }) => {
+        return await authProvider.addUser(
+          twitchIntegration!.id,
+          {
+            accessToken,
+            refreshToken,
+            obtainmentTimestamp: Number(obtainmentTimestamp),
+            expiresIn,
+          },
+          modbotId === id ? ["moderation", "chat"] : ["moderation"]
+        );
+      }
+    )
+  );
+}
+
 export async function init() {
   console.log("initializing twitch...");
 
   if (!modbotId) return;
 
-  const modbotTokens = await getTwitchTokensForUserId(modbotId);
+  console.log("adding users to authprovider");
+  await addUsersToAuthProvider();
+  console.log(await authProvider.getAccessTokenForIntent("chat"));
 
-  await authProvider.addUserForToken(
-    {
-      accessToken: modbotTokens.accessToken,
-      refreshToken: modbotTokens.refreshToken,
-      obtainmentTimestamp: 0,
-      expiresIn: 0,
-    },
-    ["chat"] // @NOTE: https://twurple.js.org/docs/auth/concepts/intents.html
-  );
+  // const modbotTokens = await getTwitchTokensForUserId(modbotId);
+
+  // await authProvider.addUserForToken(
+  //   {
+  //     accessToken: modbotTokens.accessToken,
+  //     refreshToken: modbotTokens.refreshToken,
+  //     obtainmentTimestamp: 0,
+  //     expiresIn: 0,
+  //   },
+  //   ["chat"] // @NOTE: https://twurple.js.org/docs/auth/concepts/intents.html
+  // );
+
+  console.log("starting chat client...");
   await chatClient.connect();
 }
 

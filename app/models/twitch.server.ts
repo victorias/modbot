@@ -88,3 +88,16 @@ export async function getAllTwitchChannels() {
     },
   });
 }
+
+export async function getAllTwitchTokens() {
+  return prisma.twitchAccessToken.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          twitchIntegration: true,
+        },
+      },
+    },
+  });
+}
