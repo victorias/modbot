@@ -1,57 +1,74 @@
 import type { V2_MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
+import { useState } from "react";
 
-import { useOptionalUser } from "~/utils";
+export const meta: V2_MetaFunction = () => [
+  { title: "Modbot - AI-powered Twitch Moderator" },
+];
 
-export const meta: V2_MetaFunction = () => [{ title: "Remix Notes" }];
+const Demo = () => {
+  const [msgBox, setMsgBox] = useState<string[]>([]);
+  const [value, setValue] = useState("");
+  return (
+    <div className="flex flex-1 flex-row">
+      <div className="w-1/2">
+        <div className="mt-4 border p-4">
+          {msgBox.map((msg) => (
+            <div>you: {msg}</div>
+          ))}
+        </div>
+        <input
+          type="text"
+          placeholder="Try typing something..."
+          className="mb-4 w-full border p-4"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setMsgBox([...msgBox, value]);
+              setValue("");
+            }
+          }}
+        ></input>
+      </div>
+      <div className="w-1/2">Results</div>
+    </div>
+  );
+};
 
 export default function Index() {
-  const user = useOptionalUser();
   return (
     <main className="relative min-h-screen bg-white lg:flex lg:items-center lg:justify-center">
-      <div className="relative min-w-full sm:pb-16 sm:pt-8 font-mono">
-        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 border-b-2">
+      <div className="relative min-w-full font-mono sm:pb-16 sm:pt-8">
+        <div className="mx-auto max-w-7xl border-b-2 sm:px-6 lg:px-8">
           <div className="flex flex-col">
             <div className="flex items-end justify-between">
               <div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl">
-                  <span>
-                    modbot
-                  </span>
-                </h1>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl">modbot</h1>
               </div>
               <div>
-                <span>
-                  AI-powered Twitch chat moderator
-                </span>
+                <h2>AI-powered Twitch chat moderator</h2>
               </div>
             </div>
             <div className="flex justify-start">
-              <Link to="/join" className="flex items-center justify-center bg-sky-300 rounded-md border border-transparent px-4 py-3 text-base font-medium shadow-sm sm:px-8">
+              <Link
+                to="/join"
+                className="flex items-center justify-center rounded-md border border-transparent bg-sky-300 px-4 py-3 text-base font-medium shadow-sm sm:px-8"
+              >
                 Sign up
               </Link>
             </div>
           </div>
-          
         </div>
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="flex justify-end">
-            <div className="flex-1">
-              <div className="w-1/4">
-                <div className="border p-4 mt-4">
-
-                </div>
-                <div className="border p-4 mb-4">
-                  Try typing something...
-                </div>
-              </div>
-              <div className="w-1/4">
-                Results
-              </div>
-            </div>
-            <div className="border-l-2 max-w-sm">
+            <Demo />
+            <div className="max-w-sm border-l-2">
               <p>
-                modbot uses AI sentiment analysis to remove offensive messages that are hateful, violent, sexual, or promote self-harm.
+                modbot uses AI sentiment analysis to remove offensive messages
+                that are hateful, violent, sexual, or promote self-harm.
               </p>
               <Link to="/join">
                 <u>Connect</u> your Twitch channel to set up modbot in minutes.
