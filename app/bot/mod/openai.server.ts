@@ -16,10 +16,10 @@ export async function moderate(input: string) {
   return {
     flagged: result.flagged,
     categories: {
-      hate: categories.hate && categories["hate/threatening"],
+      hate: categories.hate || categories["hate/threatening"],
       selfHarm: categories["self-harm"],
-      sexual: categories.sexual && categories["sexual/minors"],
-      violence: categories.violence && categories["violence/graphic"],
+      sexual: categories.sexual || categories["sexual/minors"],
+      violence: categories.violence || categories["violence/graphic"],
     },
   };
 }

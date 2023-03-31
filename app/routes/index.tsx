@@ -1,39 +1,82 @@
-import type { V2_MetaFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { json, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import { Form, Link, useFetcher } from "@remix-run/react";
 import { useState } from "react";
+import { moderate } from "~/bot/mod/openai.server";
+import { get } from "~/utils/fetch";
 
 export const meta: V2_MetaFunction = () => [
   { title: "Modbot - AI-powered Twitch Moderator" },
 ];
 
+export async function loader({ request }: LoaderArgs) {
+  const url = new URL(request.url);
+  const message = url.searchParams.get("message") || "";
+
+  const moderation = await moderate(message);
+  return json(moderation);
+}
+
 const Demo = () => {
   const [msgBox, setMsgBox] = useState<string[]>([]);
   const [value, setValue] = useState("");
+  const [results, setResults] = useState({
+    flagged: false,
+    categories: {
+      hate: false,
+      selfHarm: false,
+      sexual: false,
+      violence: false,
+    },
+  });
+
+  const moderation = useFetcher();
+  console.log(moderation);
+
   return (
     <div className="flex flex-1 flex-row">
       <div className="w-1/2">
         <div className="mt-4 border p-4">
           {msgBox.map((msg) => (
-            <div>you: {msg}</div>
+            <div>
+              <b>you:</b> {msg}
+            </div>
           ))}
         </div>
-        <input
-          type="text"
-          placeholder="Try typing something..."
-          className="mb-4 w-full border p-4"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setMsgBox([...msgBox, value]);
-              setValue("");
-            }
-          }}
-        ></input>
+        <Form method="get">
+          <input
+            type="text"
+            placeholder="Try typing something..."
+            className="mb-4 w-full border p-4"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+            }}
+            onKeyDown={async (e) => {
+              if (e.key === "Enter") {
+                setMsgBox([...msgBox, value]);
+                setValue("");
+                moderation.submit({ message: value });
+              }
+            }}
+          ></input>
+        </Form>
       </div>
-      <div className="w-1/2">Results</div>
+      <div className="w-1/2 flex-col">
+        <h3>Results</h3>
+        <ul>
+          <li>hate: {moderation.data?.categories.hate ? "true" : "false"}</li>
+          <li>
+            self harm: {moderation.data?.categories.selfHarm ? "true" : "false"}
+          </li>
+          <li>
+            violence: {moderation.data?.categories.violence ? "true" : "false"}
+          </li>
+          <li>
+            sexual: {moderation.data?.categories.sexual ? "true" : "false"}
+          </li>
+          <li>Flagged: {moderation.data?.flagged ? "true" : "false"}</li>
+        </ul>
+      </div>
     </div>
   );
 };
