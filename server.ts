@@ -70,7 +70,6 @@ app.all("/twitch-bot/channels/join", async (req, res) => {
 });
 
 app.all("/twitch-bot/channels/mod", async (req, res) => {
-  console.log("/mod");
   const userId = req.body.userId;
   const twitchIntegration = await getTwitchIntegrationForUserId(userId);
   const modbotIntegration = await getModbotTwitchIntegration();
@@ -81,9 +80,9 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
     );
     res.json({ ok: true });
   } catch (e) {
+    // @ts-ignore
     const message = JSON.parse(e?.body).message;
     if (message === "user is already a mod") {
-      console.log("user is already mod");
       res.json({
         ok: true,
       });
@@ -98,16 +97,14 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
 });
 
 app.get("/twitch-bot/onboarded", async (req, res) => {
-  console.log("/onboarded");
   const userId = req.query.userId as string;
   const twitchIntegration = await getTwitchIntegrationForUserId(userId);
 
   // just check if we are in the channel to see if we are onboarded.
-  console.log(twitchIntegration.twitchChannelName);
   const isOnboarded = chatClient.currentChannels.includes(
     `#${twitchIntegration.twitchChannelName}`
   );
-  console.log(chatClient.currentChannels);
+
   res.json({
     ok: true,
     isOnboarded,

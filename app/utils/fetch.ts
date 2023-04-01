@@ -1,6 +1,8 @@
+const modbotUrl = process.env.MODBOT_URL || "http://localhost:3000";
+
 export async function post(url: String, data: Record<string, any> = {}) {
   // @TODO: @PROD: fix these URLs when we go to prod
-  const fetchUrl = `http://localhost:3000/${
+  const fetchUrl = `${modbotUrl}/${
     url.startsWith("/") ? url.substring(1) : url
   }`;
   const options = {
@@ -11,8 +13,6 @@ export async function post(url: String, data: Record<string, any> = {}) {
     body: JSON.stringify(data),
   };
   const returnedData = await (await fetch(fetchUrl, options)).json();
-  // @TODO: @PROD: only console.log if we're in local
-  console.log(returnedData);
   return returnedData;
 }
 
@@ -22,7 +22,7 @@ export async function get(url: string, data: Record<string, any> = {}) {
     .join("&");
 
   const response = await fetch(
-    `http://localhost:3000/${url.startsWith("/") ? url.substring(1) : url}${
+    `${modbotUrl}/${url.startsWith("/") ? url.substring(1) : url}${
       query ? `?${query}` : ""
     }`,
     {
