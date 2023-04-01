@@ -54,12 +54,12 @@ export default function IndexPage() {
               href="/dashboard"
               className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8"
             >
-              Go to Dashboard
+              Dashboard
             </a>
           ) : (
             <Form action="/auth/twitch" method="post">
               <button className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8">
-                Sign up
+                Connect to Twitch
               </button>
             </Form>
           )}
@@ -146,15 +146,16 @@ export default function IndexPage() {
             )}
           </ul>
         </div>
-        <div className="col-start-6 row-start-4 row-end-5 max-w-xs sm:p-6 lg:p-8">
+        <div className="col-start-6 row-start-4 row-end-6 max-w-xs sm:p-6 lg:p-8">
           <p className="mb-10">
             modbot uses AI sentiment analysis to remove offensive messages that
             are hateful, violent, sexual, or promote self-harm.
           </p>
-          <Form action="/auth/twitch" method="post">
+          <Form action="/auth/twitch" method="post" className="mb-10">
             <button className="inline underline">Connect</button> your Twitch
-            channel to set up modbot in minutes.
+            channel to set up modbot for free.
           </Form>
+          <p>Questions? Chat with us on Discord.</p>
         </div>
 
         <div className="col-start-6 row-start-3 row-end-6 border-l-2"></div>

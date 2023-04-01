@@ -8,7 +8,6 @@ import {
 import { useState } from "react";
 import { getTwitchIntegrationForUserId } from "~/models/twitch.server";
 import { authenticator } from "~/services/auth.server";
-import { apiClient, authProvider } from "~/services/twitch.server";
 import { get } from "~/utils/fetch";
 
 export async function loader({ request }: LoaderArgs) {
@@ -35,62 +34,38 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function DashboardPage() {
   const {
-    user: { id },
     twitchIntegration: { twitchChannelName },
   } = useLoaderData<typeof loader>();
-  const [loading, setLoading] = useState(false);
 
-  console.log("dashboard page");
   return (
-    <main className="flex flex-col">
-      <h1>Hi, i'm Logged In and my ID is {id}</h1>
-      <h1>My channel name is {twitchChannelName}</h1>
-      <Form action="/logout" method="post">
-        <button>Logout</button>
-      </Form>
+    <main className="mt-10 flex align-middle font-mono">
+      <div className="grid-rows-12 m-auto grid max-h-fit w-10/12 max-w-screen-xl grid-cols-6 justify-center p-10">
+        <div className="col-span-7 col-start-1 row-start-1 flex justify-between border-b-2">
+          <h1 className="m-2 text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
+            modbot
+          </h1>
 
-      <button
-        onClick={async () => {
-          setLoading(true);
-          console.log(`clicked button to join ${twitchChannelName}`);
-          // @TODO: @PROD: fix these URLs when we go to prod
-          const url = "http://localhost:3000/twitch-bot/channels/join";
-          const data = { channel: twitchChannelName };
-          const options = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          };
-          const currentChannels = await (await fetch(url, options)).json();
-          console.log(currentChannels);
-          setLoading(false);
-        }}
-      >
-        Join Channel
-        {loading ? "loading" : "not loading"}
-      </button>
-      <button
-        onClick={async () => {
-          console.log(`clicked set mod button`);
-          // @TODO: @PROD: fix these URLs when we go to prod
-          const url = "http://localhost:3000/twitch-bot/channels/mod";
-          const data = { userId: id };
-          const options = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          };
-          const currentChannels = await (await fetch(url, options)).json();
-          console.log(currentChannels);
-          setLoading(false);
-        }}
-      >
-        test
-      </button>
+          <h2 className="sm:m-6 lg:m-8">AI-powered Twitch chat moderator</h2>
+        </div>
+
+        <div className="col-start-2 col-end-6 row-start-2 pt-6 leading-loose lg:pt-8">
+          <p className="mb-4 leading-normal">
+            You've successfully connected modbotapp to{" "}
+            <b>{twitchChannelName}</b> on Twitch!
+          </p>
+          <p className="mb-4 leading-normal">
+            <b>modbotapp</b> is now automatically monitoring your channel's chat
+            messages.
+          </p>
+          <p className="mb-4 leading-normal">
+            Questions? Chat with us on{" "}
+            <a href="" className="underline">
+              Discord
+            </a>
+            .
+          </p>
+        </div>
+      </div>
     </main>
   );
 }
