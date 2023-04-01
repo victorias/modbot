@@ -27,7 +27,7 @@ export async function loader({ request }: LoaderArgs) {
 export default function IndexPage() {
   const [msgBox, setMsgBox] = useState<string[]>([]);
   const [value, setValue] = useState("");
-  const moderation = useFetcher();
+  const moderation = useFetcher<typeof loader>();
   const { user } = useLoaderData<typeof loader>();
 
   // just store the index of msgs that have been flagged for UI purposes
@@ -41,13 +41,13 @@ export default function IndexPage() {
 
   return (
     <main className="mt-10 flex align-middle font-mono">
-      <div className="m-auto grid min-w-min max-w-screen-xl grid-cols-index grid-rows-index justify-center">
+      <div className="m-auto grid min-w-min max-w-screen-xl grid-cols-index grid-rows-index justify-center p-10">
         <div className="col-start-1 row-start-1">
-          <h1 className="text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl ">
+          <h1 className="m-2 text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
             modbot
           </h1>
         </div>
-        <div className="col-start-1 row-start-2 border-b-2">
+        <div className="col-start-1 row-start-2 m-2">
           {!!user ? (
             <a
               href="/dashboard"
@@ -104,7 +104,7 @@ export default function IndexPage() {
               Hateful ...{" "}
               {moderation.type === "init"
                 ? ""
-                : moderation.data?.categories.hate
+                : moderation.data?.categories?.hate
                 ? "Fail"
                 : "Pass"}
             </li>
@@ -112,7 +112,7 @@ export default function IndexPage() {
               Violent ...{" "}
               {moderation.type === "init"
                 ? ""
-                : moderation.data?.categories.violence
+                : moderation.data?.categories?.violence
                 ? "Fail"
                 : "Pass"}
             </li>
@@ -120,7 +120,7 @@ export default function IndexPage() {
               Sexual ...{" "}
               {moderation.type === "init"
                 ? ""
-                : moderation.data?.categories.sexual
+                : moderation.data?.categories?.sexual
                 ? "Fail"
                 : "Pass"}
             </li>
@@ -128,7 +128,7 @@ export default function IndexPage() {
               Self-harm ...{" "}
               {moderation.type === "init"
                 ? ""
-                : moderation.data?.categories.selfHarm
+                : moderation.data?.categories?.selfHarm
                 ? "Fail"
                 : "Pass"}
             </li>
@@ -155,7 +155,7 @@ export default function IndexPage() {
 
         <div className="col-start-6 row-start-3 row-end-6 border-l-2"></div>
 
-        <div className="col-start-2 col-end-7 row-start-2 border-b-2"></div>
+        <div className="col-start-1 col-end-7 row-start-2 border-b-2"></div>
       </div>
     </main>
   );
