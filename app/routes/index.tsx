@@ -1,6 +1,6 @@
 import { ActionArgs, json, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { Form, Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { moderate } from "~/bot/mod/openai.server";
 import { authenticator } from "~/services/auth.server";
 
@@ -29,6 +29,7 @@ export default function IndexPage() {
   const [value, setValue] = useState("");
   const moderation = useFetcher<typeof loader>();
   const { user } = useLoaderData<typeof loader>();
+  const messageBoxDiv = useRef<HTMLDivElement>();
 
   // just store the index of msgs that have been flagged for UI purposes
   const [flaggedMsgs, setFlaggedMsgs] = useState(new Set());
@@ -67,7 +68,10 @@ export default function IndexPage() {
           <h2>AI-powered Twitch chat moderator</h2>
         </div>
         <div className="col-start-1 col-end-7 row-start-3 h-10"></div>
-        <div className="col-start-1 col-end-3 row-start-4 row-end-5 h-96  border p-4 sm:w-full lg:w-[32rem]">
+        <div
+          ref={messageBoxDiv as React.LegacyRef<HTMLDivElement>}
+          className="col-start-1 col-end-3 row-start-4 row-end-5 h-96  overflow-scroll border p-4 align-baseline sm:w-full lg:w-[32rem]"
+        >
           {msgBox.map((msg, idx) => (
             <div
               key={idx}
@@ -155,7 +159,7 @@ export default function IndexPage() {
 
         <div className="col-start-6 row-start-3 row-end-6 border-l-2"></div>
 
-        <div className="col-start-1 col-end-7 row-start-2 border-b-2"></div>
+        <div className="pointer-events-none col-start-1 col-end-7 row-start-2 border-b-2"></div>
       </div>
     </main>
   );
