@@ -33,12 +33,12 @@ app.use(
 );
 
 // Enable CORS and allow requests only from trusted domains
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Replace with your domain
-    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://localhost:3000", // Replace with your domain
+//     optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+//   })
+// );
 
 app.use((req, res, next) => {
   // helpful headers:
