@@ -7,7 +7,7 @@ import { post } from "~/utils/fetch";
 
 export async function loader({ request }: LoaderArgs) {
   const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
+    failureRedirect: "/",
   });
   const twitchIntegration = await getTwitchIntegrationForUserId(user.id);
   return json({

@@ -2,7 +2,14 @@
 module.exports = {
   content: ["./app/**/*.{ts,tsx,jsx,js}"],
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        index: "repeat(6, minmax(0px, auto))",
+      },
+      gridTemplateRows: {
+        index: "repeat(5, minmax(0px, auto))",
+      },
+    },
   },
   plugins: [],
 };

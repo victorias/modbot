@@ -15,7 +15,7 @@ export async function loader({ request }: LoaderArgs) {
   // Redirect to /onboarding if we the user has not been onboarded
   // @link: https://github.com/sergiodxa/remix-auth#custom-redirect-url-based-on-the-user
   const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
+    failureRedirect: "/",
   });
 
   const response = await get("/twitch-bot/onboarded", { userId: user.id });
