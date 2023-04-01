@@ -86,7 +86,7 @@ export default function IndexPage() {
 
   return (
     <main className="mt-10 flex align-middle font-mono">
-      <div className="m-auto grid max-w-screen-xl grid-cols-index grid-rows-index justify-center">
+      <div className="m-auto grid min-w-min max-w-screen-xl grid-cols-index grid-rows-index justify-center">
         <div className="col-start-1 row-start-1">
           <h1 className="text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl ">
             modbot
