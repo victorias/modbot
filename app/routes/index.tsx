@@ -155,7 +155,17 @@ export default function IndexPage() {
             <button className="inline underline">Connect</button> your Twitch
             channel to set up modbot for free.
           </Form>
-          <p>Questions? Chat with us on Discord.</p>
+          <p>
+            Questions? Chat with us on{" "}
+            <a
+              href="https://discord.gg/KBEbzMxG78"
+              target="__blank"
+              className="underline"
+            >
+              Discord
+            </a>
+            .
+          </p>
         </div>
 
         <div className="col-start-6 row-start-3 row-end-6 border-l-2"></div>

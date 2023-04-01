@@ -59,7 +59,11 @@ export default function DashboardPage() {
           </p>
           <p className="mb-4 leading-normal">
             Questions? Chat with us on{" "}
-            <a href="" className="underline">
+            <a
+              href="https://discord.gg/KBEbzMxG78"
+              target="__blank"
+              className="underline"
+            >
               Discord
             </a>
             .
