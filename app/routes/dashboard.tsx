@@ -14,12 +14,13 @@ import { get } from "~/utils/fetch";
 export async function loader({ request }: LoaderArgs) {
   // Redirect to /onboarding if we the user has not been onboarded
   // @link: https://github.com/sergiodxa/remix-auth#custom-redirect-url-based-on-the-user
+
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/",
   });
 
   const response = await get("/twitch-bot/onboarded", { userId: user.id });
-  console.log({ response });
+
   if (!response.isOnboarded) {
     return redirect("/onboarding");
   }
@@ -39,6 +40,7 @@ export default function DashboardPage() {
   } = useLoaderData<typeof loader>();
   const [loading, setLoading] = useState(false);
 
+  console.log("dashboard page");
   return (
     <main className="flex flex-col">
       <h1>Hi, i'm Logged In and my ID is {id}</h1>

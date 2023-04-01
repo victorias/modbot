@@ -1,7 +1,8 @@
-import { json, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
-import { Form, useFetcher } from "@remix-run/react";
+import { ActionArgs, json, LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import { Form, Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { moderate } from "~/bot/mod/openai.server";
+import { authenticator } from "~/services/auth.server";
 
 export const meta: V2_MetaFunction = () => [
   { title: "Modbot - AI-powered Twitch Moderator" },
@@ -11,72 +12,27 @@ export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const message = url.searchParams.get("message") || "";
 
-  const moderation = await moderate(message);
-  return json(moderation);
-}
+  let moderation;
+  if (message) {
+    moderation = await moderate(message);
+  }
 
-const Demo = () => {
-  const [msgBox, setMsgBox] = useState<string[]>([]);
-  const [value, setValue] = useState("");
-  const moderation = useFetcher();
-  return (
-    <div className="flex flex-1 flex-row">
-      <div className="w-1/2">
-        <div className="mt-4 border p-4">
-          {msgBox.map((msg) => (
-            <div>
-              <b>you:</b> {msg}
-            </div>
-          ))}
-        </div>
-        <Form method="get">
-          <input
-            type="text"
-            placeholder="Try typing something..."
-            className="mb-4 w-full border p-4"
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-            onKeyDown={async (e) => {
-              if (e.key === "Enter") {
-                setMsgBox([...msgBox, value]);
-                setValue("");
-                moderation.submit({ message: value });
-              }
-            }}
-          ></input>
-        </Form>
-      </div>
-      <div className="w-1/2 flex-col">
-        <h3>Results</h3>
-        <ul>
-          <li>hate: {moderation.data?.categories.hate ? "true" : "false"}</li>
-          <li>
-            self harm: {moderation.data?.categories.selfHarm ? "true" : "false"}
-          </li>
-          <li>
-            violence: {moderation.data?.categories.violence ? "true" : "false"}
-          </li>
-          <li>
-            sexual: {moderation.data?.categories.sexual ? "true" : "false"}
-          </li>
-          <li>Flagged: {moderation.data?.flagged ? "true" : "false"}</li>
-        </ul>
-      </div>
-    </div>
-  );
-};
+  const user = await authenticator.isAuthenticated(request);
+  return json({
+    ...moderation,
+    user,
+  });
+}
 
 export default function IndexPage() {
   const [msgBox, setMsgBox] = useState<string[]>([]);
   const [value, setValue] = useState("");
   const moderation = useFetcher();
+  const { user } = useLoaderData<typeof loader>();
 
   // just store the index of msgs that have been flagged for UI purposes
   const [flaggedMsgs, setFlaggedMsgs] = useState(new Set());
 
-  console.log(moderation);
   useEffect(() => {
     if (moderation.type === "done" && moderation.data.flagged) {
       setFlaggedMsgs(flaggedMsgs.add(msgBox[msgBox.length - 1]));
@@ -92,11 +48,20 @@ export default function IndexPage() {
           </h1>
         </div>
         <div className="col-start-1 row-start-2 border-b-2">
-          <Form action="/auth/twitch" method="post">
-            <button className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8">
-              Sign up
-            </button>
-          </Form>
+          {!!user ? (
+            <a
+              href="/dashboard"
+              className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8"
+            >
+              Go to Dashboard
+            </a>
+          ) : (
+            <Form action="/auth/twitch" method="post">
+              <button className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8">
+                Sign up
+              </button>
+            </Form>
+          )}
         </div>
         <div className="row-1 col-span-3 col-start-4 row-span-1 flex items-end justify-end sm:m-6 lg:m-8">
           <h2>AI-powered Twitch chat moderator</h2>

@@ -4,13 +4,7 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
-import cors from "cors";
-import {
-  apiClient,
-  authProvider,
-  chatClient,
-  init,
-} from "~/services/twitch.server";
+import { apiClient, chatClient, init } from "~/services/twitch.server";
 import {
   getModbotTwitchIntegration,
   getTwitchIntegrationForUserId,
