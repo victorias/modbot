@@ -128,6 +128,8 @@ export async function init() {
   await addUsersToAuthProvider();
   console.log(await authProvider.getAccessTokenForIntent("chat"));
 
+  console.log(authProvider.getIntentsForUser("40673593"));
+
   // const modbotTokens = await getTwitchTokensForUserId(modbotId);
 
   // await authProvider.addUserForToken(
