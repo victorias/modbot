@@ -21,27 +21,27 @@ async function createAndLogin(email: string) {
 
   // const user = await createUser({ email, password: "myreallystrongpassword" });
 
-  // const response = await createUserSession({
-  //   request: new Request("test://test"),
-  //   userId: user.id,
-  //   remember: false,
-  //   redirectTo: "/",
-  // });
+  const response = await createUserSession({
+    request: new Request("test://test"),
+    userId: "123",
+    remember: false,
+    redirectTo: "/",
+  });
 
-  // const cookieValue = response.headers.get("Set-Cookie");
-  // if (!cookieValue) {
-  //   throw new Error("Cookie missing from createUserSession response");
-  // }
-  // const parsedCookie = parse(cookieValue);
+  const cookieValue = response.headers.get("Set-Cookie");
+  if (!cookieValue) {
+    throw new Error("Cookie missing from createUserSession response");
+  }
+  const parsedCookie = parse(cookieValue);
   // we log it like this so our cypress command can parse it out and set it as
   // the cookie value.
-  //   console.log(
-  //     `
-  // <cookie>
-  //   ${parsedCookie.__session}
-  // </cookie>
-  //   `.trim()
-  //   );
+  console.log(
+    `
+  <cookie>
+    ${parsedCookie.__session}
+  </cookie>
+    `.trim()
+  );
 }
 
 createAndLogin(process.argv[2]);
