@@ -1,4 +1,8 @@
-const modbotUrl = process.env.MODBOT_URL || "http://localhost:3000";
+// Fetch runs in both client and server contexts
+// process only runs in server contexts, so we add env vars to window on root.tsx and extract it that way
+// @ts-ignore
+const modbotUrl = (typeof document === "undefined" ? process : window).env
+  .MODBOT_URL;
 
 export async function post(url: String, data: Record<string, any> = {}) {
   // @TODO: @PROD: fix these URLs when we go to prod
