@@ -39,9 +39,9 @@ export default function DashboardPage() {
 
   return (
     <main className="mt-10 flex align-middle font-mono">
-      <div className="grid-rows-12 m-auto grid max-h-fit w-10/12 max-w-screen-xl grid-cols-6 justify-center p-10">
-        <div className="col-span-7 col-start-1 row-start-1 flex justify-between border-b-2">
-          <h1 className="m-2 text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
+      <div className="grid-rows-12 m-auto grid max-h-fit max-w-screen-xl grid-cols-6 justify-center p-10  lg:w-10/12">
+        <div className="col-span-7 col-start-1 row-start-1 flex flex-col justify-between border-b-2 lg:flex-row">
+          <h1 className="text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
             modbot
           </h1>
 

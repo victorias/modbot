@@ -42,46 +42,41 @@ export default function IndexPage() {
 
   return (
     <main className="mt-10 flex align-middle font-mono">
-      <div className="m-auto grid min-w-min max-w-screen-xl grid-cols-index grid-rows-index justify-center p-10">
-        <div className="col-start-1 row-start-1">
-          <h1 className="m-2 text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
+      <div className="grid-rows-12 m-auto grid max-h-fit max-w-screen-xl grid-cols-6 justify-center p-10  lg:w-10/12">
+        <div className="col-span-7 col-start-1 row-start-1 flex flex-col justify-between lg:flex-row">
+          <h1 className="text-4xl sm:m-6 sm:text-5xl lg:m-8 lg:text-6xl">
             modbot
           </h1>
+
+          <h2 className="sm:m-6 lg:m-8">AI-powered Twitch chat moderator</h2>
         </div>
-        <div className="col-start-1 row-start-2 m-2">
+        <div className="col-span-7 col-start-1 row-start-2 border-b-2 pb-2">
           {!!user ? (
             <a
               href="/dashboard"
-              className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8"
+              className="flex min-w-fit max-w-sm items-center justify-center bg-sky-300  px-5 py-3 text-base font-medium shadow-sm"
             >
               Dashboard
             </a>
           ) : (
             <Form action="/auth/twitch" method="post">
-              <button className="flex items-center justify-center bg-sky-300  px-4 py-3 text-base font-medium shadow-sm sm:mx-6 sm:mb-6 sm:px-8 lg:mx-8 lg:mb-8">
+              <button className="flex min-w-fit max-w-sm items-center justify-center bg-sky-300  px-5 py-3 text-base font-medium shadow-sm">
                 Connect to Twitch
               </button>
             </Form>
           )}
         </div>
-        <div className="row-1 col-span-3 col-start-4 row-span-1 flex items-end justify-end sm:m-6 lg:m-8">
-          <h2>AI-powered Twitch chat moderator</h2>
-        </div>
-        <div className="col-start-1 col-end-7 row-start-3 h-10"></div>
-        <div
-          ref={messageBoxDiv as React.LegacyRef<HTMLDivElement>}
-          className="col-start-1 col-end-3 row-start-4 row-end-5 h-96  overflow-scroll border p-4 align-baseline sm:w-full lg:w-[32rem]"
-        >
-          {msgBox.map((msg, idx) => (
-            <div
-              key={idx}
-              className={flaggedMsgs.has(msg) ? "text-red-500" : ""}
-            >
-              <b>you:</b> {msg}
-            </div>
-          ))}
-        </div>
-        <div className="col-start-1 col-end-3 row-start-5 sm:w-full lg:w-[32rem]">
+        <div className="col-start-1 col-end-7 row-start-3 row-end-5 flex flex-col lg:col-end-3">
+          <div className="mt-10 flex min-h-[15rem] flex-auto flex-col overflow-scroll border-2 p-3">
+            {msgBox.map((msg, idx) => (
+              <div
+                key={idx}
+                className={flaggedMsgs.has(msg) ? "text-red-500" : ""}
+              >
+                <b>you:</b> {msg}
+              </div>
+            ))}
+          </div>
           <Form method="get">
             <input
               type="text"
@@ -101,7 +96,8 @@ export default function IndexPage() {
             ></input>
           </Form>
         </div>
-        <div className="col-start-4 row-start-4 row-end-6 leading-10 sm:m-8 lg:m-8 lg:w-[20rem]">
+
+        <div className="col-start-1 col-end-7 row-start-6 row-end-6 mb-10 flex flex-col pt-10 lg:col-start-3 lg:col-end-5 lg:row-start-3 lg:row-end-3 lg:p-10">
           <h3>Results:</h3>
           <ul>
             <li>
@@ -146,7 +142,7 @@ export default function IndexPage() {
             )}
           </ul>
         </div>
-        <div className="col-start-6 row-start-4 row-end-6 max-w-xs sm:p-6 lg:p-8">
+        <div className="col-span-7 col-start-1 row-start-7 border-t-2 pt-10 lg:col-start-5 lg:col-end-7 lg:row-start-3 lg:row-end-3 lg:border-t-0 lg:border-l-2 lg:p-10">
           <p className="mb-10">
             modbot uses AI sentiment analysis to remove offensive messages that
             are hateful, violent, sexual, or promote self-harm.
@@ -167,10 +163,6 @@ export default function IndexPage() {
             .
           </p>
         </div>
-
-        <div className="col-start-6 row-start-3 row-end-6 border-l-2"></div>
-
-        <div className="pointer-events-none col-start-1 col-end-7 row-start-2 border-b-2"></div>
       </div>
     </main>
   );
