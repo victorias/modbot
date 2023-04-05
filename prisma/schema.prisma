@@ -9,7 +9,7 @@ generator client {
 
 model User {
   id    String @id @default(cuid())
-  email String @unique
+  email String? // twitch accounts do not necessarily have emails
   displayName String?
   profileImageUrl String?
 

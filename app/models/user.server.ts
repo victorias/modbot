@@ -13,7 +13,7 @@ export async function getUserByTwitchId(id: TwitchIntegration["id"]) {
 }
 
 export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ where: { email } });
+  // return prisma.user.findUnique({ where: { email } });
 }
 
 export async function createTwitchUser({
@@ -53,5 +53,5 @@ export async function createTwitchUser({
 }
 
 export async function deleteUserByEmail(email: User["email"]) {
-  return prisma.user.delete({ where: { email } });
+  // return prisma.user.delete({ where: { email } });
 }
