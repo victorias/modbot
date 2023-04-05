@@ -4,10 +4,16 @@ import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
-import { apiClient, chatClient, init } from "~/services/twitch.server";
+import {
+  apiClient,
+  authProvider,
+  chatClient,
+  init,
+} from "~/services/twitch.server";
 import {
   getModbotTwitchIntegration,
   getTwitchIntegrationForUserId,
+  getTwitchTokensForUserId,
 } from "~/models/twitch.server";
 
 const modbotId = process.env.MODBOT_USER_ID;
@@ -67,6 +73,15 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
   const userId = req.body.userId;
   const twitchIntegration = await getTwitchIntegrationForUserId(userId);
   const modbotIntegration = await getModbotTwitchIntegration();
+  // if we came frome /onboarding, we might have a weird bug where authProvider doesn't
+  // have the user. so we readd the user here just in case.
+  const twitchAccessTokens = await getTwitchTokensForUserId(userId);
+  // @TODO: @ERROR if no access tokens
+  authProvider.addUser(twitchIntegration.id, {
+    ...twitchAccessTokens,
+    obtainmentTimestamp: Number(twitchAccessTokens.obtainmentTimestamp),
+  });
+
   try {
     await apiClient.moderation.addModerator(
       twitchIntegration.id,
@@ -74,7 +89,8 @@ app.all("/twitch-bot/channels/mod", async (req, res) => {
     );
     res.json({ ok: true });
   } catch (e) {
-    // @ts-ignore
+    console.error(e);
+    //@ts-ignore
     const message = JSON.parse(e?.body).message;
     if (message === "user is already a mod") {
       res.json({
