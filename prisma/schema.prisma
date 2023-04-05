@@ -48,6 +48,7 @@ model TwitchMessage {
   senderTwitchUsername String // the username of the twitch member who sent the message
   isFlagged Boolean @default(false) // did we flag and deleted this msg?
   moderation Json // openai moderation result
+  twitchResponseStatusCode Int? // what twitch responded with, 204 means deleted. only exists if the msg was flagged
 
   twitchIntegrationId String
   twitchIntegration TwitchIntegration @relation(fields: [twitchIntegrationId], references: [id], onDelete: Cascade, onUpdate: Cascade)

@@ -2,7 +2,6 @@ import { Authenticator } from "remix-auth";
 import { sessionStorage } from "~/session.server";
 import { TwitchStrategy } from "@03gibbss/remix-auth-twitch";
 import { createTwitchUser, getUserByTwitchId } from "~/models/user.server";
-import { RefreshingAuthProvider } from "@twurple/auth";
 import { setTwitchAccessToken } from "~/models/twitch.server";
 import { apiClient, authProvider, chatClient } from "./twitch.server";
 
@@ -71,9 +70,6 @@ let twitchStrategy = new TwitchStrategy(
     } = profile;
     let user: User | null = await getUserByTwitchId(twitchId);
     const channel = await apiClient.channels.getChannelInfoById(twitchId);
-    console.log(`channel info`);
-    console.log(channel?.id);
-    console.log(channel?.displayName);
 
     if (!!!user) {
       // We didn't find a user which means this is their first login
@@ -101,23 +97,6 @@ let twitchStrategy = new TwitchStrategy(
       },
       ["moderation"]
     );
-
-    if (modbotId) {
-      // Set modbot as mod
-      try {
-        console.log("attempting to make mod");
-        // await apiClient.moderation.addModerator(twitchId, "40673593");
-        // 40673593 is modbot's twitch Id. @TODO: put this in env or something
-        console.log("made mod");
-
-        console.log("attempting to join channel");
-        // Tell modbot to join this channel
-        // await chatClient.join(channel!.name);
-        console.log("joined channel");
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
     return { id: user.id };
   }

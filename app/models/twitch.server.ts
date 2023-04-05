@@ -1,4 +1,9 @@
-import { TwitchAccessToken, TwitchIntegration, User } from "@prisma/client";
+import {
+  TwitchAccessToken,
+  TwitchIntegration,
+  TwitchMessage,
+  User,
+} from "@prisma/client";
 import { prisma } from "~/db.server";
 import { getUserByTwitchId } from "./user.server";
 
@@ -98,6 +103,39 @@ export async function getAllTwitchTokens() {
           twitchIntegration: true,
         },
       },
+    },
+  });
+}
+
+export async function createTwitchMessage({
+  broadcasterId,
+  messageId,
+  sentAt,
+  content,
+  isFlagged,
+  senderTwitchUsername,
+  moderation,
+  twitchResponseStatusCode,
+}: {
+  broadcasterId: TwitchIntegration["id"];
+  messageId: TwitchMessage["id"];
+  sentAt: TwitchMessage["sentAt"];
+  content: TwitchMessage["content"];
+  senderTwitchUsername: TwitchMessage["senderTwitchUsername"];
+  isFlagged: TwitchMessage["isFlagged"];
+  twitchResponseStatusCode?: TwitchMessage["twitchResponseStatusCode"];
+  moderation: {};
+}) {
+  return prisma.twitchMessage.create({
+    data: {
+      id: messageId,
+      twitchIntegrationId: broadcasterId,
+      sentAt,
+      content,
+      senderTwitchUsername,
+      isFlagged,
+      moderation,
+      twitchResponseStatusCode,
     },
   });
 }

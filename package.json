@@ -42,6 +42,7 @@
     "@remix-run/react": "^1.14.3",
     "@remix-run/server-runtime": "^1.14.3",
     "@twurple/api": "^6.0.9",
+    "@twurple/api-call": "^6.1.0",
     "@twurple/auth": "^6.0.9",
     "@twurple/chat": "^6.0.9",
     "@twurple/eventsub-ws": "^6.0.9",

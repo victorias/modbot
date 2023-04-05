@@ -1,8 +1,10 @@
 import { ApiClient } from "@twurple/api";
+import { HttpStatusCodeError } from "@twurple/api-call";
 import { RefreshingAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 import { moderate } from "~/bot/mod/openai.server";
 import {
+  createTwitchMessage,
   getAllTwitchChannels,
   getAllTwitchTokens,
   getModbotTwitchIntegration,
@@ -56,24 +58,63 @@ const apiClient = new ApiClient({
 
 chatClient.onMessage(async (channel, user, text, message) => {
   if (!modbotId) return;
-  console.log(`${channel} @${user}: ${text}`);
-  const { flagged } = await moderate(text);
+  const { flagged, ...moderation } = await moderate(text);
+  // console.log(`${channel} @${user}: ${text}`);
 
-  if (flagged && message.channelId) {
-    // @TODO
-    // If OpenAI flags the message,
-    // we delete it and store it in our db (?)
+  // Store all messages in our db for now
+  // @TODO: ignore certain messages, like cheers, redemptions, highlights, mod messages?
+  if (message.channelId) {
     const twitchIntegration = await getTwitchIntegrationForChannelId(
       message.channelId
     );
-    const modbotTwitchIntegration = await getModbotTwitchIntegration();
-    const broadercasterTwitchId = twitchIntegration?.id;
-    if (broadercasterTwitchId) {
-      await apiClient.moderation.deleteChatMessages(
-        broadercasterTwitchId,
-        modbotTwitchIntegration.id,
-        message.id
-      );
+    let statusCode;
+    if (twitchIntegration) {
+      if (flagged) {
+        // if flagged, delete it
+        const modbotTwitchIntegration = await getModbotTwitchIntegration();
+        const broadercasterTwitchId = twitchIntegration.id;
+        statusCode = 204; // successfully removed message
+        if (broadercasterTwitchId) {
+          try {
+            await apiClient.moderation.deleteChatMessages(
+              broadercasterTwitchId,
+              modbotTwitchIntegration.id,
+              message.id
+            );
+          } catch (e: any) {
+            statusCode = e.statusCode;
+            switch (e.statusCode) {
+              case 400:
+                // tried to delete a mod message, just ignore this
+                break;
+              case 401:
+                // unauthorized, @TODO
+                break;
+              case 403:
+                // we are not a mod, @TODO
+                break;
+              case 404:
+                // message id was not found, or message was sent >6 hours ago. ignore this
+                break;
+              default:
+                // unhandled status code error, or statusCode is undefined and it's an internal error
+                // @TODO: log this state to sentry
+                break;
+            }
+          }
+        }
+      }
+
+      await createTwitchMessage({
+        broadcasterId: twitchIntegration.id,
+        messageId: message.id,
+        sentAt: message.date,
+        senderTwitchUsername: user,
+        content: text,
+        isFlagged: flagged,
+        moderation,
+        twitchResponseStatusCode: statusCode,
+      });
     }
   }
 });
@@ -95,27 +136,25 @@ chatClient.onAuthenticationSuccess(() => {
 
 async function addUsersToAuthProvider() {
   const tokens = await getAllTwitchTokens();
-  return Promise.all(
-    tokens.map(
-      async ({
-        user: { twitchIntegration, id },
-        accessToken,
-        refreshToken,
-        obtainmentTimestamp,
-        expiresIn,
-      }) => {
-        return await authProvider.addUser(
-          twitchIntegration!.id,
-          {
-            accessToken,
-            refreshToken,
-            obtainmentTimestamp: Number(obtainmentTimestamp),
-            expiresIn,
-          },
-          modbotId === id ? ["moderation", "chat"] : ["moderation"]
-        );
-      }
-    )
+  tokens.map(
+    ({
+      user: { twitchIntegration, id },
+      accessToken,
+      refreshToken,
+      obtainmentTimestamp,
+      expiresIn,
+    }) => {
+      return authProvider.addUser(
+        twitchIntegration!.id,
+        {
+          accessToken,
+          refreshToken,
+          obtainmentTimestamp: Number(obtainmentTimestamp),
+          expiresIn,
+        },
+        modbotId === id ? ["moderation", "chat"] : ["moderation"]
+      );
+    }
   );
 }
 
